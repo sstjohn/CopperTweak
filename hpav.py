@@ -42,11 +42,16 @@ if __name__ == "__main__":
 	bind_layers(Ether, MME, type=0x88e1)
 	req = Ether(dst = DEST_MAC, type=0x88e1) 
 	req /= MME(mmtype = 0x70a0)
-	resp = srp1(req, iface = HPAV_IFACE, timeout=1)
+	last_res = 0
 	score = 0
-	for c in resp[MME].carriers:
-		high = (0xF0 & c) >> 4
-		low = 0xF & c
-		score += (high + low)
+	while last_res == 0:
+		resp = srp1(req, iface = HPAV_IFACE, timeout=1, filter="ether proto 0x88e1")
+		last_res = resp[MME].mstatus
+		if last_res == 0:
+			for c in resp[MME].carriers:
+				high = (0xF0 & c) >> 4
+				low = 0xF & c
+				score += (high + low)
+		req[MME].slot += 1
 	print "Overall tone map score is %i" % score
 
