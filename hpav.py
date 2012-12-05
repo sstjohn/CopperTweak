@@ -38,6 +38,12 @@ class MME(Packet):
 							htons(p.carrier_cnt) / 2),
 				is_tm_resp) ]
 
+def score_carrier(value):
+	try:
+		return [0, 2, 4, 8, 16, 64, 256, 1024][value]
+	except:
+		raise "unknown carrier value %i" % value
+
 if __name__ == "__main__":
 	bind_layers(Ether, MME, type=0x88e1)
 	req = Ether(dst = DEST_MAC, type=0x88e1) 
@@ -49,9 +55,8 @@ if __name__ == "__main__":
 		last_res = resp[MME].mstatus
 		if last_res == 0:
 			for c in resp[MME].carriers:
-				high = (0xF0 & c) >> 4
-				low = 0xF & c
-				score += (high + low)
+				score += score_carrier((0xF0 & c) >> 4)
+				score += score_carrier(0xF & c)
 		req[MME].slot += 1
 	print "Overall tone map score is %i" % score
 
