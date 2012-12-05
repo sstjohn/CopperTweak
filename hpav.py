@@ -7,7 +7,7 @@ DEST_MAC = "00:b0:52:00:00:01"
 #PEER_MAC = "b0:b2:dc:61:7d:cc"
 PEER_MAC = "cc:5d:4e:96:1c:7f"
 
-packet_types = {
+mme_packet_types = {
 	0x70a0: [
 		MACField("peer", PEER_MAC),
 		PadField(ByteField("slot", 0), 34)
@@ -31,8 +31,8 @@ def GetMMEFields():
 	yield ByteField("mmver", 0)
 	yield XShortField("mmtype", 0)
 	yield X3BytesField("OUI", 0x00b052)
-	for t in packet_types:
-		for f in packet_types[t]:
+	for t in mme_packet_types:
+		for f in mme_packet_types[t]:
 			yield TypeConditionalField(t, f)
 
 class MME(Packet):
