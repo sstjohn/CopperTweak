@@ -46,8 +46,8 @@ def score_carrier(value):
 
 def get_tm_score(interface, dest_mac, peer_mac):
 	bind_layers(Ether, MME, type=0x88e1)
-	req = Ether(dst = dest_mac, peer = peer_mac, type=0x88e1) 
-	req /= MME(mmtype = 0x70a0)
+	req = Ether(dst = dest_mac, type=0x88e1) 
+	req /= MME(mmtype = 0x70a0, peer = peer_mac)
 	last_res = 0
 	score = 0
 	while last_res == 0:
