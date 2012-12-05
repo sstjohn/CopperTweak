@@ -44,14 +44,14 @@ def score_carrier(value):
 	except:
 		raise Exception("unknown carrier value %i" % value)
 
-if __name__ == "__main__":
+def get_tm_score(interface, dest_mac, peer_mac):
 	bind_layers(Ether, MME, type=0x88e1)
-	req = Ether(dst = DEST_MAC, type=0x88e1) 
-	req /= MME(mmtype = 0x70a0)
+	req = Ether(dst = dest_mac, type=0x88e1) 
+	req /= MME(mmtype = 0x70a0, peer = peer_mac)
 	last_res = 0
 	score = 0
 	while last_res == 0:
-		resp = srp1(req, iface = HPAV_IFACE, timeout=1, 
+		resp = srp1(req, iface = interface, timeout=1, 
 				filter="ether proto 0x88e1", verbose = 0)
 		last_res = resp[MME].mstatus
 		if last_res == 0:
@@ -59,5 +59,9 @@ if __name__ == "__main__":
 				score += score_carrier((0xF0 & c) >> 4)
 				score += score_carrier(0xF & c)
 		req[MME].slot += 1
+	return score
+
+if __name__ == "__main__":
+	score = get_tm_score(HPAV_IFACE, DEST_MAC, PEER_MAC)
 	print "Overall tone map score is %i" % score
 
