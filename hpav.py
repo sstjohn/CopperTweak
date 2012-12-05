@@ -7,36 +7,31 @@ DEST_MAC = "00:b0:52:00:00:01"
 #PEER_MAC = "b0:b2:dc:61:7d:cc"
 PEER_MAC = "cc:5d:4e:96:1c:7f"
 
+def TypeConditionalField(t, f):
+	cond = lambda p: p.mmtype == t
+	return ConditionalField(f, cond)
+
 class MME(Packet):
-	is_tm_req = lambda p: p.mmtype == 0x70a0
-	is_tm_resp = lambda p: p.mmtype == 0x71a0
 	cnt_to_fl_len = lambda p: htons(p.carrier_cnt) / 2	
 	fields_desc = [ ByteField("mmver", 0),
 			XShortField("mmtype", 0),
 			X3BytesField("OIU", 0x00b052),
-			ConditionalField(
-				MACField("peer", PEER_MAC),
-				is_tm_req),
-			ConditionalField(
-				PadField(ByteField("slot", 0), 34),
-				is_tm_req),
-			ConditionalField(
-				ByteField("mstatus", 0),
-				is_tm_resp),
-			ConditionalField(
-				ByteField("tmslot", 0),
-				is_tm_resp),
-			ConditionalField(
-				ByteField("num_tms", 0),
-				is_tm_resp),
-			ConditionalField(
-				XShortField("carrier_cnt", 0),
-				is_tm_resp),
-			ConditionalField(
+			TypeConditionalField(0x70a0, 
+					MACField("peer", PEER_MAC)),
+			TypeConditionalField(0x70a0, 
+				PadField(ByteField("slot", 0), 34)),
+			TypeConditionalField(0x71a0, 
+				ByteField("mstatus", 0)),
+			TypeConditionalField(0x71a0, 
+				ByteField("tmslot", 0)),
+			TypeConditionalField(0x71a0, 
+				ByteField("num_tms", 0)),
+			TypeConditionalField(0x71a0, 
+				XShortField("carrier_cnt", 0)),
+			TypeConditionalField(0x71a0, 
 				FieldListField("carriers", [0],
 						XByteField("", 0),
-						count_from = cnt_to_fl_len),
-				is_tm_resp) ]
+						count_from = cnt_to_fl_len)) ]
 
 bind_layers(Ether, MME, type=0x88e1)
 
