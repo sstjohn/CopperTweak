@@ -40,9 +40,9 @@ class MME(Packet):
 
 def score_carrier(value):
 	try:
-		return [0, 2, 4, 8, 16, 64, 256, 1024][value]
+		return [0, 2, 4, 8, 16, 64, 256, 1024, 4096][value]
 	except:
-		raise "unknown carrier value %i" % value
+		raise Exception("unknown carrier value %i" % value)
 
 if __name__ == "__main__":
 	bind_layers(Ether, MME, type=0x88e1)
