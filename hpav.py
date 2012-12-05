@@ -38,30 +38,45 @@ class MME(Packet):
 						count_from = cnt_to_fl_len),
 				is_tm_resp) ]
 
+bind_layers(Ether, MME, type=0x88e1)
+
 def score_carrier(value):
 	try:
 		return [0, 2, 4, 8, 16, 64, 256, 1024, 4096][value]
 	except:
 		raise Exception("unknown carrier value %i" % value)
 
-def get_tm_score(interface, dest_mac, peer_mac):
-	bind_layers(Ether, MME, type=0x88e1)
+def get_tmi_score(index, interface, dest_mac, peer_mac):
 	req = Ether(dst = dest_mac, type=0x88e1) 
 	req /= MME(mmtype = 0x70a0, peer = peer_mac)
-	last_res = 0
+	req[MME].slot = index 
+	resp = srp1(req, iface = interface, timeout=1, 
+			filter="ether proto 0x88e1", verbose = 0)
+	if resp[MME].mstatus != 0:
+		raise Exception("response status %i" % resp[MME].mstatus)
 	score = 0
-	while last_res == 0:
-		resp = srp1(req, iface = interface, timeout=1, 
-				filter="ether proto 0x88e1", verbose = 0)
-		last_res = resp[MME].mstatus
-		if last_res == 0:
-			for c in resp[MME].carriers:
-				score += score_carrier((0xF0 & c) >> 4)
-				score += score_carrier(0xF & c)
-		req[MME].slot += 1
-	return score
+	for c in resp[MME].carriers:
+		score += score_carrier((0xF0 & c) >> 4)
+		score += score_carrier(0xF & c)
+	return score / (2 * len(resp[MME].carriers))
+
+def get_tm_score(interface, dest_mac, peer_mac):
+	index = 0
+	scores_sum = 0
+	try:
+		while True:
+			scores_sum += get_tmi_score(index, interface, 
+						dest_mac, peer_mac)
+			index += 1
+	except:
+		pass
+	if index != 0:
+		return scores_sum / index
+	return 0
+
+def get_def_tm_score():
+	return get_tm_score(HPAV_IFACE, DEST_MAC, PEER_MAC)
 
 if __name__ == "__main__":
-	score = get_tm_score(HPAV_IFACE, DEST_MAC, PEER_MAC)
-	print "Overall tone map score is %i" % score
+	print "Overall tone map score is %i" % get_def_tm_score()
 
