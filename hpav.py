@@ -74,6 +74,9 @@ def get_tm_score(interface, dest_mac, peer_mac):
 		return scores_sum / index
 	return 0
 
+def get_def_tmi_score(index):
+	return get_tmi_score(index, HPAV_IFACE, DEST_MAC, PEER_MAC)
+
 def get_def_tm_score():
 	return get_tm_score(HPAV_IFACE, DEST_MAC, PEER_MAC)
 
