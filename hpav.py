@@ -10,6 +10,7 @@ PEER_MAC = "cc:5d:4e:96:1c:7f"
 class MME(Packet):
 	is_tm_req = lambda p: p.mmtype == 0x70a0
 	is_tm_resp = lambda p: p.mmtype == 0x71a0
+	cnt_to_fl_len = lambda p: htons(p.carrier_cnt) / 2	
 	fields_desc = [ ByteField("mmver", 0),
 			XShortField("mmtype", 0),
 			X3BytesField("OIU", 0x00b052),
@@ -34,8 +35,7 @@ class MME(Packet):
 			ConditionalField(
 				FieldListField("carriers", [0],
 						XByteField("", 0),
-						count_from = lambda p: 
-							htons(p.carrier_cnt) / 2),
+						count_from = cnt_to_fl_len),
 				is_tm_resp) ]
 
 def score_carrier(value):
@@ -51,7 +51,8 @@ if __name__ == "__main__":
 	last_res = 0
 	score = 0
 	while last_res == 0:
-		resp = srp1(req, iface = HPAV_IFACE, timeout=1, filter="ether proto 0x88e1")
+		resp = srp1(req, iface = HPAV_IFACE, timeout=1, 
+				filter="ether proto 0x88e1", verbose = 0)
 		last_res = resp[MME].mstatus
 		if last_res == 0:
 			for c in resp[MME].carriers:
