@@ -13,9 +13,6 @@ def score_carrier(value):
 	except:
 		raise Exception("unknown carrier value %i" % value)
 
-class TestException(Exception):
-	pass
-
 def get_tmi_score(index, interface, dest_mac, peer_mac):
 	req = Ether(dst = dest_mac, type=0x88e1) 
 	req /= MME(mmtype = 0x70a0, peer = peer_mac)
