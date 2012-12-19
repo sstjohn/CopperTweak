@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from scapy.all import *
 from mme import MME
 
@@ -47,5 +49,5 @@ def get_def_tm_score():
 	return get_tm_score(HPAV_IFACE, DEST_MAC, PEER_MAC)
 
 if __name__ == "__main__":
-	print "Overall tone map score is %i" % get_def_tm_score()
+	interact(mydict=globals(), mybanner="CopperTweak v0.2")
 
