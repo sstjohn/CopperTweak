@@ -36,7 +36,7 @@ def gen_network_info_confirm():
 	for f in fixed_fields:
 		yield f
 	for i in range(1, 255):
-		has_field = lambda p: p.num_stas >= i
+		has_field = lambda p: p.sta_info_count >= i
 		yield ConditionalField(MACField(
 			"sta_macaddr_%s" % i, "0:0:0:0:0:0"),
 			has_field)
