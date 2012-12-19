@@ -19,6 +19,6 @@ mmtypes = {
 		ByteField("direction", 0),
 		LongField("systime", 0),
 		IntField("beacontime", 0),
-		#...
+		#...followed by an frame-control field as yet undissected
 		]
 } 

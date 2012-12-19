@@ -23,6 +23,38 @@ class StaInfoField(Field):
 
 info_cnt = lambda p: p.sta_info_count
 
+def gen_network_info_confirm():
+	fixed_fields = [
+                ByteField("num_avlns", 0),
+                ArrayField("nid", 0, ByteField("", 0), 7),
+                ByteField("snid", 0),
+                ByteField("tei", 0),
+                ByteField("sta_role", 0),
+                MACField("cco_macaddr", "0:0:0:0:0:0"),
+                ByteField("cco_tei", 0),
+                ByteField("sta_info_count", 0)]
+	for f in fixed_fields:
+		yield f
+	for i in range(1, 255):
+		has_field = lambda p: p.num_stas >= i
+		yield ConditionalField(MACField(
+			"sta_macaddr_%s" % i, "0:0:0:0:0:0"),
+			has_field)
+		yield ConditionalField(ByteField(
+			"sta_tei_%s" % i, 0),
+			has_field)
+		yield ConditionalField(MACField(
+			"bridge_macaddr_%s" % i, "0:0:0:0:0:0"),
+			has_field)
+		yield ConditionalField(ByteField(
+			"avg_phy_tx_rate_%s" % i, 0),
+			has_field)
+		yield ConditionalField(ByteField(
+			"avg_phy_rx_rate_%s" % i, 0),
+			has_field)
+
+
+
 mmtypes = {
         0x4860: [
                 ],
@@ -34,20 +66,5 @@ mmtypes = {
                 ],
 	0x38a0: [
 		],
-	0x39a0: [
-		ByteField("num_avlns", 0),
-		#FieldListField("nid", [0, 0, 0, 0, 0, 0, 0],
-		#		ByteField("", 0),
-		#		count_from = lambda p: 7),
-		ArrayField("nid", 0, ByteField("", 0), 7),
-		ByteField("snid", 0),
-		ByteField("tei", 0),
-		ByteField("sta_role", 0),
-		MACField("cco_macaddr", "0:0:0:0:0:0"),
-		ByteField("cco_tei", 0),
-		FieldLenField("sta_info_count", None, count_of="sta_info"),
-		FieldListField("sta_info", None,
-				VendorStaInfoField("", None), 
-				count_from = info_cnt),
-		]
+	0x39a0: [f for f in gen_network_info_confirm()]
 } 
