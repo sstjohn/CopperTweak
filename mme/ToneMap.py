@@ -7,7 +7,7 @@ mmtypes = {
                 PadField(ByteField("slot", 0), 34)
                 ],
         0x71a0: [
-                ByteField("mstatus", 0),
+                ByteField("tmstatus", 0),
                 ByteField("tmslot", 0),
                 ByteField("num_tms", 0),
                 XShortField("carrier_cnt", 0),

@@ -7,7 +7,28 @@ HPAV_IFACE = "eth0"
 DEST_MAC = "00:b0:52:00:00:01"
 #PEER_MAC = "cc:5d:4e:96:54:29"
 #PEER_MAC = "b0:b2:dc:61:7d:cc"
-PEER_MAC = "cc:5d:4e:96:1c:7f"
+PEER_MAC = "cc:5d:4e:96:54:29"
+
+def get_link_statistics(control, direction, link_id,
+			interface = HPAV_IFACE,
+			dest_mac = DEST_MAC):
+	req = Ether(dst = dest_mac, type = 0x88e1)
+	req /= MME(mmtype = 0x30a0)
+	req.control = control
+	req.direction = direction
+	req.link_id = link_id
+	resp = srp1(req, iface = interface, timeout = 1,
+			filter = "ether proto 0x88e1", verbose = 1)
+	return resp
+
+
+def get_network_info(interface = HPAV_IFACE,
+			dest_mac = DEST_MAC):
+	req = Ether(dst = dest_mac, type=0x88e1)
+	req /= MME(mmtype = 0x38a0)
+	resp = srp1(req, iface = interface, timeout=1,
+			filter = "ether proto 0x88e1", verbose = 0)
+	return resp
 
 def score_carrier(value):
 	try:
@@ -21,7 +42,7 @@ def get_tmi_score(index, interface, dest_mac, peer_mac):
 	req[MME].slot = index 
 	resp = srp1(req, iface = interface, timeout=1, 
 			filter="ether proto 0x88e1", verbose = 0)
-	if resp[MME].mstatus != 0:
+	if resp[MME].tmstatus != 0:
 		return -1
 	score = 0
 	for c in resp[MME].carriers:

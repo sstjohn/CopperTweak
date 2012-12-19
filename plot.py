@@ -22,11 +22,11 @@ class ToneMap():
 if __name__ == "__main__":
 	x = []
 	pylab.ion()
-	pylab.axis([0, PLOT_TIME, 0, 4096])
+	pylab.axis([0, PLOT_TIME, 0, 2048])
 	tms = [ToneMap(i, x) for i in range(0,10)]
         for i in range(0, PLOT_TIME * 5):
 		x.append(i / 5)
 		for tm in tms:
 			tm.update()
 		pylab.draw()
-		sleep(1/5)
+		sleep(1 / 5)
