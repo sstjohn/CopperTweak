@@ -4,15 +4,18 @@ import sys
 from importlib import import_module
 from scapy.all import *
 
+from _internal_types import TypeConditionalField
+
 known_mme = {}
 mme_packet_types = {}
+
 
 def register_mme():
 	files = os.listdir(__file__.rsplit('/', 1)[0])
 
 	for f in files:
 		name = ""
-		if f.startswith("__init__"):
+		if f.startswith("_"):
 			continue
 		if f.endswith(".py") or f.endswith(".pyc"):
 			name = f.rsplit(".",1)[0]
@@ -23,10 +26,6 @@ def register_mme():
 
 		known_mme[name] = import_module(__package__ + "." + name, globals())
 		mme_packet_types.update(known_mme[name].mmtypes)
-
-def TypeConditionalField(t, f):
-        cond = lambda p: p.mmtype == t
-        return ConditionalField(f, cond)
 
 def GetMMEFields():
         yield ByteField("mmver", 0)

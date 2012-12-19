@@ -1,6 +1,7 @@
 from scapy.all import *
 from socket import htons
 from scapy.fields import Field
+from _internal_types import *
 
 #structure:
 # sta_macaddr[6]
@@ -35,9 +36,10 @@ mmtypes = {
 		],
 	0x39a0: [
 		ByteField("num_avlns", 0),
-		FieldListField("nid", [0, 0, 0, 0, 0, 0, 0],
-				ByteField("", 0),
-				count_from = lambda p: 7),
+		#FieldListField("nid", [0, 0, 0, 0, 0, 0, 0],
+		#		ByteField("", 0),
+		#		count_from = lambda p: 7),
+		ArrayField("nid", 0, ByteField("", 0), 7),
 		ByteField("snid", 0),
 		ByteField("tei", 0),
 		ByteField("sta_role", 0),

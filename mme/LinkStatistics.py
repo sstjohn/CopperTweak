@@ -1,9 +1,9 @@
 from scapy.all import *
 from socket import htons
 
-resp_is_tx = lambda p: p.direction = 0x00
-resp_is_rx = lambda p: p.direction = 0x01
-resp_is_both = lambda p: p.direction = 0x02
+resp_is_tx = lambda p: p.direction == 0x00
+resp_is_rx = lambda p: p.direction == 0x01
+resp_is_both = lambda p: p.direction == 0x02
 
 resp_has_txstats = lambda p: resp_is_tx(p) or resp_is_both(p)
 resp_has_rxstats = lambda p: resp_is_rx(p) or resp_is_both(p)
