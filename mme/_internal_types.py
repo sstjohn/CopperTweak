@@ -1,4 +1,4 @@
-from scapy.fields import FieldListField, ConditionalField
+from scapy.fields import FieldListField, ConditionalField, Field
 
 def TypeConditionalField(t, f):
         cond = lambda p: p.mmtype == t
